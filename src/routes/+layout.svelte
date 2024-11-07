@@ -12,13 +12,13 @@
 	  </NavBrand>
 	  <NavHamburger />
 	  <NavUl>
-		<NavLi href="/monday">Monday</NavLi>
-		<NavLi href="/about">Tuesday</NavLi>
-		<NavLi href="/docs/components/navbar">Wednesday</NavLi>
-		<NavLi href="/pricing">Thursday</NavLi>
-		<NavLi href="/contact">Friday</NavLi>
-		<NavLi href="/contact">Saturday</NavLi>
-		<NavLi href="/contact">Sunday</NavLi>
+		<NavLi href="/Monday">Monday</NavLi>
+		<NavLi href="/Tuesday">Tuesday</NavLi>
+		<NavLi href="/Wednesday">Wednesday</NavLi>
+		<NavLi href="/Thursday">Thursday</NavLi>
+		<NavLi href="/Friday">Friday</NavLi>
+		<NavLi href="/Saturday">Saturday</NavLi>
+		<NavLi href="/Sunday">Sunday</NavLi>
 	  </NavUl>
 	</Navbar>
 </div>

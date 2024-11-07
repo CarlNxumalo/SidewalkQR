@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 export function load({ params }) {
-    
+
     const dailyImages = {
         0: "SundaySpecial.jpg",    // Sunday
         1: "MondaySpecial.jpg",    // Monday
@@ -14,4 +14,8 @@ export function load({ params }) {
       // Get the current day of the week (0 = Sunday, 6 = Saturday)
       const today = new Date().getDay();
       const todayImage = dailyImages[today];
+
+      return {
+         todayImage, 
+      }
 }

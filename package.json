@@ -41,6 +41,7 @@
 		"vitest": "^2.0.4"
 	},
 	"dependencies": {
+		"@azure/storage-blob": "^12.26.0",
 		"svelte-icons": "^2.1.0"
 	}
 }

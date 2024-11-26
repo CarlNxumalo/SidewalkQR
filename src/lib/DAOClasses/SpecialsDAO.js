@@ -2,7 +2,7 @@ import { testConnection } from '../DAOClasses/DatabaseConnection.js';
 import Specials from '../Classes/Specials.js';
 import sql from 'mssql';
 
-class FileDAO {
+class SpecialsDAO {
     constructor() {
         this.connectionString = "Server=tcp:sidewalk-server.database.windows.net,1433;Initial Catalog=sidewalkDB;Persist Security Info=False;User ID=sidewalk;Password=Thabang12;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
     }
@@ -24,96 +24,40 @@ class FileDAO {
         }
     }
 
-    async uploadFile(file) {
+    async uploadFile(specials) {
         let connection;
         try {
             connection = await testConnection(); // Database connections
             
             const query = `
-                INSERT INTO FILES (Path, Type,userID, ApprovedAt, Status, Report, Grade, SubjectID, FileSize)
-                VALUES ( @Path, @Type,@userID, @ApprovedAt, @Status, @Report, @Grade, @SubjectID, @FileSize)
+                INSERT INTO Specials (Special_ID, Name,Price, Description, Day, Start_time, End_time, Path)
+                VALUES ( @specialsID, @name,@price, @description, @day, @startTime, @endTime, @path)
             `;
 
             await connection.request()
                 
-                .input('Path', sql.NVarChar, file.path)
-                .input('Type', sql.NVarChar, file.type)
-                .input('userID', sql.Int, file.userID)
-                .input('ApprovedAt', sql.DateTime, file.approvedAt)
-                .input('Status', sql.NVarChar, file.status)
-                .input('Report', sql.NVarChar, file.report)
-                .input('Grade', sql.NVarChar, file.grade)
-                .input('SubjectID', sql.Int, file.subjectID)
-                .input('FileSize', sql.Int, file.fileSize)
+                .input('Special_ID', sql.Int, specials.specialsID)
+                .input('Name', sql.NVarChar, specials.name)
+                .input('Price', sql.Money, specials.price)
+                .input('Description', sql.NVarChar, specials.description)
+                .input('Day', sql.Int, specials.day)
+                .input('Start_time', sql.Time, specials.startTime)
+                .input('End_time', sql.Time, specials.endTime)
+                .input('Path', sql.NVarChar, specials.path)
+                
                 .query(query);
 
-            console.log('File uploaded successfully');
+            console.log('Image uploaded successfully');
         } catch (err) {
-            console.error('Failed to upload file:', err);
+            console.error('Failed to upload image:', err);
         } finally {
             if (connection) {
                 await connection.close(); 
             }
         }
     }
-    async getFilesByTag(tagID){
-        const query = `SELECT * 
-        FROM dbo.FILES F
-        JOIN dbo.FileTag FT ON F.FileID = FT.FileID
-        JOIN dbo.Tags T ON T.TagID = FT.TagID
-        WHERE T.TagID = @tagID;
-        `
 
-        let connection;
-        try {
-            connection = await testConnection(); // Database connection
-            const result = await connection.request().input('tagID', sql.Int, tagID).query(query);
-            return result.recordset; // Return the array of files
-        } catch (err) {
-            console.error('Failed to fetch files by tag ID:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close(); // Close the connection
-            }
-        }
-    }
-    async getFilesBySubject(subjectID){
-
-        let connection;
-        try {
-            connection = await testConnection(); // Database connection
-            const query = `SELECT * FROM FILES WHERE SubjectID = @subjectID;`
-            const result = await connection.request().input('subjectID', sql.Int, subjectID).query(query);
-            return result.recordset; // Return the array of files
-        } catch (err) {
-            console.error('Failed to fetch files by subject ID:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close(); // Close the connection
-            }
-        }
-
-    }
-    async getAllApprovedFiles(){
-        let connection;
-        try {
-            connection = await testConnection(); // Database connection
-             const query = `SELECT * FROM FILES where Status = 'Approved';`;
-            const result = await connection.request().query(query);
-            return result.recordset; // Return the array of files
-        } catch (err) {
-            console.error('Failed to fetch approved files:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close(); // Close the connection
-            }
-        }
-    }
-
-    async getAllFiles() {
+    async getAllImages() {
         const query = ''
 
         //options 
@@ -123,11 +67,11 @@ class FileDAO {
         let connection;
         try {
             connection = await testConnection(); // Database connection
-             const query = 'SELECT * FROM FILES;';
+             const query = 'SELECT * FROM Specials;';
             const result = await connection.request().query(query);
             return result.recordset; // Return the array of files
         } catch (err) {
-            console.error('Failed to fetch files:', err);
+            console.error('Failed to fetch images:', err);
             throw err;
         } finally {
             if (connection) {
@@ -136,17 +80,17 @@ class FileDAO {
         }
     }
 
-    async getFileById(fileId) {
+    async getFileById(special_id) {
         let connection;
         try {
             connection = await testConnection();
-            const query = `SELECT * FROM Files WHERE FileID = @fileId`;
+            const query = `SELECT * FROM Specials WHERE Special_ID = @special_id`;
             const result = await connection.request()
-                .input('fileId', sql.Int, fileId)
+                .input('Special_ID', sql.Int, special_id)
                 .query(query);
             return result.recordset.length > 0 ? result.recordset[0] : null; // Return the file if found
         } catch (err) {
-            console.error('Failed to fetch file by ID:', err);
+            console.error('Failed to fetch image by ID:', err);
             throw err;
         } finally {
             if (connection) {
@@ -155,72 +99,7 @@ class FileDAO {
         }
     }
 
-    async updateFileStatus(fileId, status) {
-        let connection;
-        try {
-            connection = await testConnection();
-            const query = `UPDATE Files SET Status = @Status WHERE FileID = @fileId`;
-            await connection.request()
-                .input('fileId', sql.Int, fileId)
-                .input('Status', sql.NVarChar, status)
-                .query(query);
-            console.log('File status updated successfully');
-        } catch (err) {
-            console.error('Failed to update file status:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close()
-            }
-        }
-    }
-
-    async reportFile(fileId, reportReason) {
-        let connection;
-        try {
-            connection = await testConnection();
-            const query = `UPDATE Files SET Report = @Report WHERE FileID = @fileId`;
-            await connection.request()
-                .input('fileId', sql.Int, fileId)
-                .input('Report', sql.NVarChar, reportReason)
-                .query(query);
-            console.log('File reported successfully');
-        } catch (err) {
-            console.error('Failed to report file:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-
-    async tagFile(fileId, tags) {
-        let connection;
-        try {
-            connection = await testConnection();
-            // Assuming you have a Tags table and a FileTags junction table
-            const query = `
-                INSERT INTO FileTags (FileID, Tag)
-                VALUES (@FileID, @Tag)
-            `;
-            for (const tag of tags) {
-                await connection.request()
-                    .input('FileID', sql.Int, fileId)
-                    .input('Tag', sql.NVarChar, tag)
-                    .query(query);
-            }
-            console.log('File tagged successfully');
-        } catch (err) {
-            console.error('Failed to tag file:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-
+    
     typeOfSearch(typp){//S 
         //type = {type, }
         let query =""
@@ -233,46 +112,19 @@ class FileDAO {
         return query;
     }
 
-    //add subject, path, and tags
-    async searchDocument(searchTerm) {
+    
 
+    async deleteImage(specialsID) {
         let connection;
         try {
             connection = await testConnection();
-            
-            const query = `
-                SELECT f.*
-                FROM Files f
-                WHERE f.Path LIKE @searchTerm ;
-            `;
-    
-            const result = await connection.request()
-                .input('searchTerm', sql.NVarChar, `%${searchTerm}%`)
-                .query(query);
-            
-            return result.recordset; // Return the matching files
-        } catch (err) {
-            console.error('Failed to search files:', err);
-            throw err;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-    
-
-    async deleteFile(fileId) {
-        let connection;
-        try {
-            connection = await testConnection();
-            const query = `DELETE FROM Files WHERE FileID = @fileId`;
+            const query = `DELETE FROM Specials WHERE Specials_ID = @specialsID`;
             await connection.request()
-                .input('fileId', sql.Int, fileId)
+                .input('Special_ID', sql.Int, specialsID)
                 .query(query);
-            console.log('File deleted successfullys');
+            console.log('Image deleted successfullys');
         } catch (err) {
-            console.error('Failed to delete file:', err);
+            console.error('Failed to delete image:', err);
             throw err;
         } finally {
             if (connection) {
@@ -281,59 +133,22 @@ class FileDAO {
         }
     }
     
-    async searchDocs(searchTerm)
+    async searchDocs(name)
     {
         try {
            
             const connection = await testConnection();
 
-            const query =`SELECT * FROM Files WHERE Filename LIKE %@searchterm%`;
+            const query =`SELECT * FROM Specials WHERE Name LIKE %@name%`;
 
             await connection?.request();    
-        } catch (error) {
-            
+        } catch (error){
+            console.error('Failed to search for image:', error);
+            throw error;
         }
     }
 
-    async moderateFile(file) {
-        let connection;
-        try {
-            // Attempt to establish connection with retries
-            connection = await testConnection();
 
-            // Validate file status
-            const validStatuses = ['approved', 'disapproved'];
-            if (!validStatuses.includes(file.status)) {
-                throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
-            }
-
-            // Update the file record in the database
-            const query = `
-                UPDATE Files 
-                SET Status = @Status, 
-                    ApprovedAt = @ApprovedAt
-                WHERE FileID = @fileId
-            `;
-
-            await connection.request()
-                .input('fileId', sql.Int, file.fileId)
-                .input('Status', sql.NVarChar, file.status)
-                .input('ApprovedAt', sql.DateTime, file.approvedAt)
-                .query(query);
-
-            console.log(`File with ID ${file.fileId} has been ${file.status}.`);
-            return true; // Success
-        } catch (error) {
-            console.error('Error moderating file:', error);
-            return false; // Failure
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-
-    
 }
 
-export default FileDAO;
+export default SpecialsDAO;

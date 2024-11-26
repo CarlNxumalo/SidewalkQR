@@ -5,6 +5,7 @@
   let { data } = $props();
 </script>
 
+
 <Section name="crudreadsection" class="flex justify-center items-center">
   <div class="p-6 space-y-4 md:space-y-6 sm:p-8 max-w-md mx-auto mt-16">
     <Card img={data.todayImage} alt="Daily Special" >

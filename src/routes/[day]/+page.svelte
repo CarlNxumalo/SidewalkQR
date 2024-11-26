@@ -7,7 +7,7 @@
   
   <Section name="crudreadsection" class="flex justify-center items-center">
     <div class="p-6 space-y-4 md:space-y-6 sm:p-8 max-w-md mx-auto mt-16">
-      <Card img={data.dayImage} alt="Daily Special" >
+      <Card img={data.dayImage} >
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           {data.day}
         </h5>

@@ -1,10 +1,10 @@
-import { testConnection } from './DatabaseConnection.js';
-import File from '../Classes/Specials.js';
+import { testConnection } from '../DAOClasses/DatabaseConnection.js';
+import Specials from '../Classes/Specials.js';
 import sql from 'mssql';
 
 class FileDAO {
     constructor() {
-        this.connectionString = "Server=tcp:share2teach-server.database.windows.net,1433;Initial Catalog=Share2Teach;Persist Security Info=False;User ID=admin-server;Password=share2teach#IT;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        this.connectionString = "Server=tcp:sidewalk-server.database.windows.net,1433;Initial Catalog=sidewalkDB;Persist Security Info=False;User ID=sidewalk;Password=Thabang12;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
     }
     
     async connect() {
